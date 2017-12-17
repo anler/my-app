@@ -1,0 +1,63 @@
+# Clojure CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-clojure/ for more details
+#
+version: 2
+jobs:
+  build:
+    working_directory: ~/repo
+
+    docker:
+      - image: circleci/clojure:lein-2.7.1
+      - image: postgres:9.6-alpine
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: app_ci
+
+    environment:
+      LEIN_ROOT: "true"
+      DATABASE_URL: "postgresql://localhost:5432/app_ci?user=root"
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "project.clj" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: lein deps
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "project.clj" }}
+
+      - run: lein test
+
+  deploy:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/clojure:lein-2.7.1
+    steps:
+      - run:
+          name: Package application
+          command: lein package
+      - run:
+          name: Deploy to S3 if tests pass and branch is master
+          command: aws s3 cp "target/uberjar/$(cat target/uberjar/app-version.txt).zip" s3://circleci-myapp/
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
