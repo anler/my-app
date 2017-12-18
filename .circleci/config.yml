@@ -22,33 +22,45 @@ jobs:
 
     steps:
       - checkout
-
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "project.clj" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
       - run: lein deps
-
       - save_cache:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "project.clj" }}
-
       - run: lein test
 
   deploy:
     working_directory: ~/repo
+
     docker:
-      - image: circleci/clojure:lein-2.7.1
+      - image: clubhouseio/circleci-clojure-aws:20170915
+
+    environment:
+      LEIN_ROOT: "true"
+
     steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "project.clj" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: lein deps
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "project.clj" }}
       - run:
           name: Package application
           command: lein package
       - run:
           name: Deploy to S3 if tests pass and branch is master
-          command: aws s3 cp "target/uberjar/$(cat target/uberjar/app-version.txt).zip" s3://circleci-myapp/
+          command: aws s3 cp "target/my-app-$(cat VERSION).zip" s3://circleci-myapp/
 
 workflows:
   version: 2

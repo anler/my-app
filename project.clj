@@ -42,12 +42,17 @@
 
   :plugins [[lein-cprop "1.0.3"]
             [migratus-lein "0.5.3"]
-            [lein-shell "0.5.0"]]
+            [lein-shell "0.5.0"]
+            [lein-zip "0.1.1"]
+            [lein-version-file "0.0.1"]]
+
+  :zip ["Dockerfile" "target/uberjar/my-app.jar"]
 
   :aliases {"package" ["do"
                        ["clean"]
                        ["uberjar"]
-                       ["shell" "./bin/package.sh"]]}
+                       ["zip"]
+                       ["version-file"]]}
 
   :profiles
   {:uberjar {:omit-source true
