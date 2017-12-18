@@ -1,7 +1,7 @@
 FROM java:8-alpine
 MAINTAINER Your Name <you@example.com>
 
-ADD my-app.jar /my-app/app.jar
+ADD target/uberjar/my-app.jar /my-app/app.jar
 
 EXPOSE 3000
 

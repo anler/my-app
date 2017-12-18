@@ -46,13 +46,13 @@
             [lein-zip "0.1.1"]
             [lein-version-file "0.0.1"]]
 
-  :zip ["Dockerfile" "target/uberjar/my-app.jar"]
+  :zip ["Dockerfile" "VERSION" "target/uberjar/my-app.jar"]
 
   :aliases {"package" ["do"
                        ["clean"]
+                       ["version-file"]
                        ["uberjar"]
-                       ["zip"]
-                       ["version-file"]]}
+                       ["zip"]]}
 
   :profiles
   {:uberjar {:omit-source true

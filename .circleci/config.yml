@@ -60,7 +60,7 @@ jobs:
           command: lein package
       - run:
           name: Deploy to S3 if tests pass and branch is master
-          command: aws s3 cp "target/my-app-$(cat VERSION).zip" s3://circleci-myapp/
+          command: aws s3 cp "target/my-app-$(cat VERSION).zip" s3://circleci-myapp/master.zip
 
 workflows:
   version: 2
